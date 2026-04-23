@@ -106,13 +106,9 @@
     }
 
     async function init() {
-      let key = await fbGet("current_session");
-      if (!key) {
-        key = "s" + Date.now().toString(36);
-        await fbSet("current_session", key);
-      }
+      const key = "s" + Date.now().toString(36);
       sessionKey = key;
-      localStorage.setItem("teacher_session", key);
+      await fbSet("current_session", key);
       poll();
       setInterval(poll, 2000);
     }
