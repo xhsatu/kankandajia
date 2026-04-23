@@ -170,7 +170,12 @@
     }
 
     function changeName() {
+      if (myName && currentSession) {
+        const key = sanitize(myName);
+        fbSet(`sessions/${currentSession}/users/${key}`, null);
+      }
       localStorage.removeItem("kankandajia_name");
+      myName = null;
       if (pollTimer) clearInterval(pollTimer);
       document.getElementById("doneSection").style.display = "none";
       document.getElementById("nameSection").style.display = "block";

@@ -68,7 +68,7 @@
   <header>
     <div>
       <h1>看看大家</h1>
-      <p class="subtitle"><span class="status-dot"></span><span class="live-label">实时同步中</span></p>
+      <p class="subtitle"><span class="status-dot"></span><span class="live-label">实时同步中</span> &nbsp;<span id="sessionLabel" style="color:#c7c7cc;font-size:12px;"></span></p>
     </div>
     <button class="btn-reset" onclick="resetSession()">新一轮 ↺</button>
   </header>
@@ -124,6 +124,7 @@
       const total = users.length;
       const doneCount = done.length;
 
+      document.getElementById("sessionLabel").textContent = "轮次：" + sessionKey;
       document.getElementById("doneCount").textContent = doneCount;
       document.getElementById("totalCount").textContent = total;
       const pct = total > 0 ? Math.round(doneCount / total * 100) : 0;
