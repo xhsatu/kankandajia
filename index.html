@@ -174,6 +174,7 @@
     let currentSession = null;
     let pollTimer = null;
     let myName = null;
+    let localDone = false;
 
     function sanitize(str) { return str.replace(/[.#$\[\]\/]/g, "_"); }
 
@@ -210,6 +211,7 @@
       document.getElementById("doneBtn").className = "btn-done idle";
       document.getElementById("doneBtn").innerHTML = '<span class="icon">✋</span><span class="label">我做完了</span>';
       document.getElementById("doneBtn").onclick = markDone;
+      localDone = false;
       fbSet(`sessions/${currentSession}/users/${sanitize(name)}`, { done: false, name, ts: Date.now() });
       startPolling(name);
     }
@@ -224,17 +226,21 @@
       const session = await fbGet("current_session");
       if (session !== currentSession) {
         currentSession = session;
+        localDone = false;
         updateBtn(false);
         await fbSet(`sessions/${currentSession}/users/${sanitize(name)}`, { done: false, name, ts: Date.now() });
       }
-      const data = await fbGet(`sessions/${currentSession}/users/${sanitize(name)}`);
-      updateBtn(data && data.done === true);
+      if (!localDone) {
+        const data = await fbGet(`sessions/${currentSession}/users/${sanitize(name)}`);
+        updateBtn(data && data.done === true);
+      }
       const lbl = document.getElementById("sessionLabel");
       if (lbl) lbl.textContent = "轮次 " + currentSession;
     }
 
     async function markDone() {
       if (!myName || !currentSession) return;
+      localDone = true;
       updateBtn(true);
       fbSet(`sessions/${currentSession}/users/${sanitize(myName)}`, { done: true, name: myName, ts: Date.now() });
     }

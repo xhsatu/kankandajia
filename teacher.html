@@ -163,11 +163,6 @@
       font-size: 13px;
       font-weight: 500;
       border: 1px solid transparent;
-      animation: chipIn 0.25s cubic-bezier(0.22,1,0.36,1) both;
-    }
-    @keyframes chipIn {
-      from { opacity: 0; transform: scale(0.9); }
-      to   { opacity: 1; transform: scale(1); }
     }
     .user-chip.done {
       background: var(--green-bg);
@@ -220,6 +215,7 @@
   <script>
     const DB = "https://kankandajia-beae8-default-rtdb.firebaseio.com";
     let sessionKey = null;
+    let lastRender = "";
 
     async function fbGet(path) {
       const r = await fetch(`${DB}/${path}.json`);
@@ -262,15 +258,17 @@
         `${doneCount} 人完成，${total - doneCount} 人未完成`;
 
       const list = document.getElementById("userList");
-      if (total === 0) {
-        list.innerHTML = '<p class="empty">等待学生加入…</p>';
-        return;
-      }
       const pending = users.filter(u => !u.done);
-      list.innerHTML = [
-        ...done.map(u => `<span class="user-chip done">${u.name}</span>`),
-        ...pending.map(u => `<span class="user-chip pending">${u.name}</span>`)
-      ].join("");
+      const newHtml = total === 0
+        ? '<p class="empty">等待学生加入…</p>'
+        : [
+            ...done.map(u => `<span class="user-chip done">${u.name}</span>`),
+            ...pending.map(u => `<span class="user-chip pending">${u.name}</span>`)
+          ].join("");
+      if (newHtml !== lastRender) {
+        list.innerHTML = newHtml;
+        lastRender = newHtml;
+      }
     }
 
     async function resetSession() {
@@ -278,6 +276,7 @@
       const key = "s" + Date.now().toString(36);
       localStorage.setItem("teacher_session", key);
       sessionKey = key;
+      lastRender = "";
       await fbSet("current_session", key);
       poll();
     }
