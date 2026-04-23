@@ -5,224 +5,161 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>我做完了</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #0e0f14;
-      --surface: #181920;
-      --surface2: #21232e;
-      --border: rgba(255,255,255,0.07);
-      --accent: #5b8cff;
-      --accent-glow: rgba(91,140,255,0.3);
-      --green: #2dce72;
-      --green-glow: rgba(45,206,114,0.3);
-      --text: #f0f1f5;
-      --muted: rgba(240,241,245,0.4);
-      --muted2: rgba(240,241,245,0.18);
+      --bg: #111113;
+      --surface: #1a1a1d;
+      --border: rgba(255,255,255,0.08);
+      --text: #f5f5f7;
+      --sub: rgba(245,245,247,0.38);
+      --accent: #f5f5f7;
+      --green: #34d170;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
-      font-family: 'DM Sans', sans-serif;
+      font-family: 'Instrument Sans', -apple-system, sans-serif;
       background: var(--bg);
       min-height: 100vh;
       display: flex;
       align-items: center;
       justify-content: center;
-      overflow: hidden;
     }
 
-    /* Ambient background orbs */
-    body::before, body::after {
-      content: '';
-      position: fixed;
-      border-radius: 50%;
-      filter: blur(80px);
-      pointer-events: none;
-      z-index: 0;
-    }
-    body::before {
-      width: 400px; height: 400px;
-      background: radial-gradient(circle, rgba(91,140,255,0.12) 0%, transparent 70%);
-      top: -100px; right: -100px;
-    }
-    body::after {
-      width: 300px; height: 300px;
-      background: radial-gradient(circle, rgba(45,206,114,0.08) 0%, transparent 70%);
-      bottom: -80px; left: -80px;
-    }
-
-    .card {
-      position: relative;
-      z-index: 1;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 28px;
-      padding: 52px 44px;
-      width: 360px;
+    .wrap {
+      width: 320px;
       text-align: center;
-      box-shadow: 0 0 0 1px rgba(255,255,255,0.04), 0 32px 64px rgba(0,0,0,0.5);
-      animation: cardIn 0.5s cubic-bezier(0.34,1.56,0.64,1) both;
+      animation: up 0.45s cubic-bezier(0.22,1,0.36,1) both;
     }
 
-    @keyframes cardIn {
-      from { opacity: 0; transform: translateY(24px) scale(0.96); }
-      to   { opacity: 1; transform: translateY(0) scale(1); }
+    @keyframes up {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
     }
 
-    /* ── NAME SECTION ── */
+    /* ── NAME ── */
     .name-section h2 {
-      font-size: 24px;
-      font-weight: 700;
+      font-size: 22px;
+      font-weight: 600;
       color: var(--text);
-      margin-bottom: 6px;
       letter-spacing: -0.3px;
+      margin-bottom: 6px;
     }
     .name-section p {
       font-size: 14px;
-      color: var(--muted);
-      margin-bottom: 28px;
+      color: var(--sub);
+      margin-bottom: 32px;
     }
 
     input {
       width: 100%;
-      padding: 14px 18px;
-      background: var(--surface2);
+      padding: 13px 16px;
+      background: var(--surface);
       border: 1px solid var(--border);
-      border-radius: 14px;
-      font-size: 16px;
-      font-family: 'DM Sans', sans-serif;
-      outline: none;
+      border-radius: 10px;
+      font-size: 15px;
+      font-family: inherit;
       color: var(--text);
-      transition: border-color 0.2s, box-shadow 0.2s;
+      outline: none;
+      transition: border-color 0.2s;
     }
-    input::placeholder { color: var(--muted2); }
-    input:focus {
-      border-color: rgba(91,140,255,0.5);
-      box-shadow: 0 0 0 3px rgba(91,140,255,0.12);
-    }
+    input::placeholder { color: rgba(245,245,247,0.2); }
+    input:focus { border-color: rgba(245,245,247,0.25); }
 
     .btn-confirm {
-      margin-top: 12px;
+      margin-top: 10px;
       width: 100%;
-      padding: 15px;
-      background: var(--accent);
-      color: white;
+      padding: 13px;
+      background: var(--text);
+      color: #111113;
       border: none;
-      border-radius: 14px;
-      font-size: 16px;
+      border-radius: 10px;
+      font-size: 15px;
       font-weight: 600;
-      font-family: 'DM Sans', sans-serif;
+      font-family: inherit;
       cursor: pointer;
-      transition: transform 0.15s, box-shadow 0.15s, opacity 0.15s;
-      box-shadow: 0 4px 20px var(--accent-glow);
+      transition: opacity 0.15s;
     }
-    .btn-confirm:hover { transform: translateY(-1px); box-shadow: 0 6px 24px var(--accent-glow); }
-    .btn-confirm:active { transform: scale(0.97); opacity: 0.85; }
+    .btn-confirm:hover { opacity: 0.88; }
+    .btn-confirm:active { opacity: 0.7; }
 
-    /* ── DONE SECTION ── */
+    /* ── DONE ── */
     .done-section { display: none; }
 
     .greeting {
-      font-size: 15px;
-      color: var(--muted);
-      margin-bottom: 36px;
+      font-size: 14px;
+      color: var(--sub);
+      margin-bottom: 48px;
     }
-    .greeting span {
-      color: var(--text);
-      font-weight: 600;
-    }
+    .greeting strong { color: var(--text); font-weight: 600; }
 
-    /* Big circle button */
     .btn-done {
-      position: relative;
-      width: 192px; height: 192px;
+      width: 176px; height: 176px;
       border-radius: 50%;
-      border: none;
+      border: 1px solid var(--border);
+      background: var(--surface);
       cursor: pointer;
       display: flex; flex-direction: column;
       align-items: center; justify-content: center;
       gap: 10px;
       margin: 0 auto;
-      transition: transform 0.2s cubic-bezier(0.34,1.56,0.64,1);
-      outline: none;
+      transition: border-color 0.2s, transform 0.15s, background 0.3s;
     }
-
-    .btn-done.idle {
-      background: linear-gradient(145deg, #5b8cff, #3a6bef);
-      box-shadow: 0 0 0 0 var(--accent-glow), 0 12px 40px rgba(91,140,255,0.4);
-      animation: idlePulse 3s ease-in-out infinite;
+    .btn-done.idle:hover {
+      border-color: rgba(245,245,247,0.22);
+      transform: scale(1.03);
     }
-    @keyframes idlePulse {
-      0%, 100% { box-shadow: 0 0 0 0 rgba(91,140,255,0.4), 0 12px 40px rgba(91,140,255,0.4); }
-      50%       { box-shadow: 0 0 0 14px rgba(91,140,255,0), 0 12px 40px rgba(91,140,255,0.4); }
-    }
-    .btn-done.idle:hover  { transform: scale(1.04); }
-    .btn-done.idle:active { transform: scale(0.94); }
+    .btn-done.idle:active { transform: scale(0.97); }
 
     .btn-done.completed {
-      background: linear-gradient(145deg, #2dce72, #1ab05e);
-      box-shadow: 0 0 0 0 var(--green-glow), 0 12px 40px rgba(45,206,114,0.4);
+      border-color: rgba(52,209,112,0.35);
+      background: rgba(52,209,112,0.07);
       cursor: default;
-      animation: completedPop 0.5s cubic-bezier(0.34,1.56,0.64,1) both, greenPulse 3s 0.5s ease-in-out infinite;
-    }
-    @keyframes completedPop {
-      from { transform: scale(0.8); opacity: 0.5; }
-      to   { transform: scale(1); opacity: 1; }
-    }
-    @keyframes greenPulse {
-      0%, 100% { box-shadow: 0 0 0 0 rgba(45,206,114,0.4), 0 12px 40px rgba(45,206,114,0.4); }
-      50%       { box-shadow: 0 0 0 14px rgba(45,206,114,0), 0 12px 40px rgba(45,206,114,0.4); }
+      transform: scale(1);
     }
 
-    /* Ripple on click */
-    .btn-done .ripple {
-      position: absolute;
-      border-radius: 50%;
-      background: rgba(255,255,255,0.25);
-      transform: scale(0);
-      animation: rippleAnim 0.6s linear;
-      pointer-events: none;
+    .btn-done .icon { font-size: 38px; line-height: 1; }
+    .btn-done .label {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--sub);
+      letter-spacing: -0.1px;
     }
-    @keyframes rippleAnim {
-      to { transform: scale(4); opacity: 0; }
-    }
-
-    .btn-done .icon { font-size: 44px; line-height: 1; }
-    .btn-done .label { font-size: 17px; font-weight: 700; color: white; letter-spacing: -0.2px; }
+    .btn-done.idle .label { color: var(--text); }
+    .btn-done.completed .label { color: var(--green); }
 
     .change-name {
-      margin-top: 24px;
+      margin-top: 28px;
       background: none;
       border: none;
-      color: var(--muted);
-      font-size: 13px;
-      font-family: 'DM Sans', sans-serif;
+      color: rgba(245,245,247,0.22);
+      font-size: 12px;
+      font-family: inherit;
       cursor: pointer;
       transition: color 0.15s;
     }
-    .change-name:hover { color: var(--accent); }
+    .change-name:hover { color: var(--sub); }
 
     #sessionLabel {
-      margin-top: 14px;
+      margin-top: 12px;
       font-size: 11px;
-      color: var(--muted2);
-      font-family: 'DM Sans', monospace;
-      letter-spacing: 0.3px;
+      color: rgba(245,245,247,0.12);
+      letter-spacing: 0.2px;
     }
   </style>
 </head>
 <body>
-  <div class="card">
+  <div class="wrap">
     <div class="name-section" id="nameSection">
-      <h2>你好！</h2>
+      <h2>你好</h2>
       <p>请输入你的名字</p>
       <input type="text" id="nameInput" placeholder="名字或编号" maxlength="20" />
-      <button class="btn-confirm" onclick="confirmName()">进入</button>
+      <button class="btn-confirm" onclick="confirmName()">确认</button>
     </div>
     <div class="done-section" id="doneSection">
-      <p class="greeting">你好，<span id="displayName"></span></p>
+      <p class="greeting">你好，<strong id="displayName"></strong></p>
       <button class="btn-done idle" id="doneBtn" onclick="markDone()">
         <span class="icon">✋</span>
         <span class="label">我做完了</span>
@@ -238,19 +175,15 @@
     let pollTimer = null;
     let myName = null;
 
-    function sanitize(str) {
-      return str.replace(/[.#$\[\]\/]/g, "_");
-    }
+    function sanitize(str) { return str.replace(/[.#$\[\]\/]/g, "_"); }
 
     async function fbGet(path) {
       const r = await fetch(`${DB}/${path}.json`);
       return r.json();
     }
-
     async function fbSet(path, data) {
       await fetch(`${DB}/${path}.json`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
+        method: "PUT", headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data)
       });
     }
@@ -259,9 +192,7 @@
       const session = await fbGet("current_session");
       currentSession = session;
       myName = localStorage.getItem("kankandajia_name");
-      if (myName) {
-        showDone(myName);
-      }
+      if (myName) showDone(myName);
     }
 
     function confirmName() {
@@ -279,8 +210,7 @@
       document.getElementById("doneBtn").className = "btn-done idle";
       document.getElementById("doneBtn").innerHTML = '<span class="icon">✋</span><span class="label">我做完了</span>';
       document.getElementById("doneBtn").onclick = markDone;
-      const key = sanitize(name);
-      fbSet(`sessions/${currentSession}/users/${key}`, { done: false, name, ts: Date.now() });
+      fbSet(`sessions/${currentSession}/users/${sanitize(name)}`, { done: false, name, ts: Date.now() });
       startPolling(name);
     }
 
@@ -295,28 +225,22 @@
       if (session !== currentSession) {
         currentSession = session;
         updateBtn(false);
-        const key = sanitize(name);
-        await fbSet(`sessions/${currentSession}/users/${key}`, { done: false, name, ts: Date.now() });
+        await fbSet(`sessions/${currentSession}/users/${sanitize(name)}`, { done: false, name, ts: Date.now() });
       }
-      const key = sanitize(name);
-      const data = await fbGet(`sessions/${currentSession}/users/${key}`);
+      const data = await fbGet(`sessions/${currentSession}/users/${sanitize(name)}`);
       updateBtn(data && data.done === true);
       const lbl = document.getElementById("sessionLabel");
-      if (lbl) lbl.textContent = "轮次：" + currentSession;
+      if (lbl) lbl.textContent = "轮次 " + currentSession;
     }
 
     async function markDone() {
       if (!myName || !currentSession) return;
       updateBtn(true);
-      const key = sanitize(myName);
-      fbSet(`sessions/${currentSession}/users/${key}`, { done: true, name: myName, ts: Date.now() });
+      fbSet(`sessions/${currentSession}/users/${sanitize(myName)}`, { done: true, name: myName, ts: Date.now() });
     }
 
     function changeName() {
-      if (myName && currentSession) {
-        const key = sanitize(myName);
-        fbSet(`sessions/${currentSession}/users/${key}`, null);
-      }
+      if (myName && currentSession) fbSet(`sessions/${currentSession}/users/${sanitize(myName)}`, null);
       localStorage.removeItem("kankandajia_name");
       myName = null;
       if (pollTimer) clearInterval(pollTimer);
@@ -329,7 +253,7 @@
       const btn = document.getElementById("doneBtn");
       if (done) {
         btn.className = "btn-done completed";
-        btn.innerHTML = '<span class="icon">✅</span><span class="label">已完成！</span>';
+        btn.innerHTML = '<span class="icon">✅</span><span class="label">已完成</span>';
         btn.onclick = null;
       } else {
         btn.className = "btn-done idle";
@@ -337,18 +261,6 @@
         btn.onclick = markDone;
       }
     }
-
-    // Ripple effect
-    document.addEventListener("click", e => {
-      const btn = e.target.closest(".btn-done.idle");
-      if (!btn) return;
-      const r = document.createElement("span");
-      r.className = "ripple";
-      const size = btn.offsetWidth;
-      r.style.cssText = `width:${size}px;height:${size}px;left:0;top:0;`;
-      btn.appendChild(r);
-      setTimeout(() => r.remove(), 700);
-    });
 
     document.getElementById("nameInput").addEventListener("keydown", e => {
       if (e.key === "Enter") confirmName();

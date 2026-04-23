@@ -3,192 +3,152 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>看看大家 · 教师端</title>
+  <title>看看大家</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #0b0c11;
-      --surface: #13141b;
-      --surface2: #1c1e28;
-      --border: rgba(255,255,255,0.06);
-      --accent: #5b8cff;
-      --green: #2dce72;
-      --green-dim: rgba(45,206,114,0.15);
-      --red: #ff5f5f;
-      --text: #eef0f6;
-      --muted: rgba(238,240,246,0.4);
-      --muted2: rgba(238,240,246,0.15);
+      --bg: #111113;
+      --surface: #1a1a1d;
+      --border: rgba(255,255,255,0.08);
+      --text: #f5f5f7;
+      --sub: rgba(245,245,247,0.38);
+      --sub2: rgba(245,245,247,0.14);
+      --green: #34d170;
+      --green-bg: rgba(52,209,112,0.08);
+      --green-border: rgba(52,209,112,0.2);
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
-      font-family: 'DM Sans', sans-serif;
+      font-family: 'Instrument Sans', -apple-system, sans-serif;
       background: var(--bg);
       min-height: 100vh;
-      padding: 40px 28px 60px;
-      position: relative;
-      overflow-x: hidden;
+      padding: 48px 32px 80px;
     }
 
-    /* Background texture */
-    body::before {
-      content: '';
-      position: fixed;
-      inset: 0;
-      background:
-        radial-gradient(ellipse 600px 400px at 80% 10%, rgba(91,140,255,0.07) 0%, transparent 60%),
-        radial-gradient(ellipse 400px 300px at 10% 90%, rgba(45,206,114,0.05) 0%, transparent 60%);
-      pointer-events: none;
-      z-index: 0;
-    }
-
-    .container { max-width: 700px; margin: 0 auto; position: relative; z-index: 1; }
+    .container { max-width: 660px; margin: 0 auto; }
 
     /* ── HEADER ── */
     header {
       display: flex;
-      align-items: flex-start;
+      align-items: center;
       justify-content: space-between;
-      margin-bottom: 36px;
-      animation: fadeUp 0.4s ease both;
+      margin-bottom: 48px;
     }
 
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(16px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-
-    header h1 {
-      font-size: 36px;
-      font-weight: 700;
+    .header-left h1 {
+      font-size: 28px;
+      font-weight: 600;
       color: var(--text);
-      letter-spacing: -0.5px;
+      letter-spacing: -0.4px;
     }
 
-    .live-badge {
+    .live-row {
       display: flex;
       align-items: center;
-      gap: 6px;
-      margin-top: 6px;
+      gap: 8px;
+      margin-top: 5px;
     }
-    .status-dot {
-      width: 7px; height: 7px;
+    .dot {
+      width: 6px; height: 6px;
       border-radius: 50%;
       background: var(--green);
-      animation: pulse 2s ease-in-out infinite;
+      animation: blink 2.5s ease-in-out infinite;
     }
-    @keyframes pulse {
-      0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(45,206,114,0.4); }
-      50%       { opacity: 0.7; box-shadow: 0 0 0 5px rgba(45,206,114,0); }
-    }
-    .live-text {
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+    .live-label {
       font-size: 12px;
-      font-weight: 600;
       color: var(--green);
-      letter-spacing: 0.5px;
-      text-transform: uppercase;
+      font-weight: 500;
+      letter-spacing: 0.3px;
     }
     #sessionLabel {
       font-family: 'DM Mono', monospace;
       font-size: 11px;
-      color: var(--muted2);
-      margin-left: 4px;
+      color: var(--sub2);
     }
 
     .btn-reset {
-      padding: 10px 18px;
+      padding: 9px 16px;
       background: transparent;
-      border: 1px solid rgba(255,95,95,0.35);
-      color: var(--red);
-      border-radius: 10px;
-      font-size: 13px;
-      font-weight: 600;
-      font-family: 'DM Sans', sans-serif;
-      cursor: pointer;
-      transition: background 0.15s, border-color 0.15s, transform 0.15s;
-      white-space: nowrap;
-    }
-    .btn-reset:hover {
-      background: rgba(255,95,95,0.1);
-      border-color: rgba(255,95,95,0.6);
-    }
-    .btn-reset:active { transform: scale(0.96); }
-
-    /* ── PROGRESS CARD ── */
-    .progress-card {
-      background: var(--surface);
       border: 1px solid var(--border);
-      border-radius: 24px;
-      padding: 36px 40px;
-      margin-bottom: 20px;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.35);
-      animation: fadeUp 0.4s 0.08s ease both;
+      color: var(--sub);
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 500;
+      font-family: inherit;
+      cursor: pointer;
+      transition: border-color 0.15s, color 0.15s;
+    }
+    .btn-reset:hover { border-color: rgba(245,245,247,0.2); color: var(--text); }
+    .btn-reset:active { opacity: 0.7; }
+
+    /* ── SCORE ── */
+    .score-block {
+      margin-bottom: 40px;
     }
 
-    .numbers-row {
+    .score-nums {
       display: flex;
       align-items: baseline;
-      gap: 6px;
-      margin-bottom: 20px;
+      gap: 4px;
+      margin-bottom: 16px;
     }
-    .big-num {
+    .num-done {
       font-family: 'DM Mono', monospace;
-      font-size: 80px;
+      font-size: 88px;
       font-weight: 500;
       line-height: 1;
-      color: var(--accent);
-      letter-spacing: -2px;
-      transition: color 0.3s;
+      color: var(--text);
+      letter-spacing: -3px;
+      transition: color 0.4s;
     }
-    .big-num.all-done { color: var(--green); }
-    .divider { font-size: 48px; font-weight: 300; color: var(--muted2); line-height: 1; }
-    .total-num {
+    .num-done.complete { color: var(--green); }
+    .num-sep {
       font-family: 'DM Mono', monospace;
-      font-size: 80px;
+      font-size: 44px;
+      font-weight: 400;
+      color: var(--sub2);
+      line-height: 1;
+      padding: 0 2px;
+    }
+    .num-total {
+      font-family: 'DM Mono', monospace;
+      font-size: 88px;
       font-weight: 500;
       line-height: 1;
-      color: var(--muted);
-      letter-spacing: -2px;
+      color: var(--sub2);
+      letter-spacing: -3px;
     }
 
-    /* Progress bar */
-    .bar-wrap {
-      background: var(--surface2);
+    .bar-track {
+      height: 2px;
+      background: var(--border);
       border-radius: 99px;
-      height: 6px;
       overflow: hidden;
       margin-bottom: 12px;
     }
     .bar-fill {
       height: 100%;
-      background: linear-gradient(90deg, var(--accent), var(--green));
+      background: var(--green);
       border-radius: 99px;
-      transition: width 0.5s cubic-bezier(0.4,0,0.2,1);
+      transition: width 0.6s cubic-bezier(0.4,0,0.2,1);
     }
     .progress-label {
       font-size: 13px;
-      color: var(--muted);
+      color: var(--sub);
     }
 
-    /* ── LIST CARD ── */
-    .list-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 24px;
-      padding: 28px 36px;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.35);
-      animation: fadeUp 0.4s 0.16s ease both;
-    }
-
-    .list-header {
+    /* ── LIST ── */
+    .section-label {
       font-size: 11px;
       font-weight: 600;
-      color: var(--muted2);
+      color: var(--sub2);
       text-transform: uppercase;
       letter-spacing: 1px;
-      margin-bottom: 20px;
+      margin-bottom: 16px;
     }
 
     .user-list {
@@ -198,69 +158,62 @@
     }
 
     .user-chip {
-      padding: 7px 14px;
+      padding: 6px 14px;
       border-radius: 99px;
-      font-size: 14px;
+      font-size: 13px;
       font-weight: 500;
       border: 1px solid transparent;
-      transition: transform 0.15s;
-      animation: chipIn 0.3s cubic-bezier(0.34,1.56,0.64,1) both;
+      animation: chipIn 0.25s cubic-bezier(0.22,1,0.36,1) both;
     }
     @keyframes chipIn {
-      from { opacity: 0; transform: scale(0.8); }
+      from { opacity: 0; transform: scale(0.9); }
       to   { opacity: 1; transform: scale(1); }
     }
-    .user-chip:hover { transform: scale(1.04); }
-
     .user-chip.done {
-      background: var(--green-dim);
-      border-color: rgba(45,206,114,0.25);
-      color: #6ef0a8;
+      background: var(--green-bg);
+      border-color: var(--green-border);
+      color: var(--green);
     }
     .user-chip.pending {
-      background: var(--surface2);
+      background: var(--surface);
       border-color: var(--border);
-      color: var(--muted);
+      color: var(--sub);
     }
-
     .empty {
-      color: var(--muted2);
-      font-size: 14px;
-      padding: 4px 0;
+      font-size: 13px;
+      color: var(--sub2);
     }
   </style>
 </head>
 <body>
   <div class="container">
     <header>
-      <div>
+      <div class="header-left">
         <h1>看看大家</h1>
-        <div class="live-badge">
-          <span class="status-dot"></span>
-          <span class="live-text">实时同步</span>
+        <div class="live-row">
+          <span class="dot"></span>
+          <span class="live-label">实时同步中</span>
           <span id="sessionLabel"></span>
         </div>
       </div>
       <button class="btn-reset" onclick="resetSession()">新一轮 ↺</button>
     </header>
 
-    <div class="progress-card">
-      <div class="numbers-row">
-        <span class="big-num" id="doneCount">0</span>
-        <span class="divider">/</span>
-        <span class="total-num" id="totalCount">0</span>
+    <div class="score-block">
+      <div class="score-nums">
+        <span class="num-done" id="doneCount">0</span>
+        <span class="num-sep">/</span>
+        <span class="num-total" id="totalCount">0</span>
       </div>
-      <div class="bar-wrap">
+      <div class="bar-track">
         <div class="bar-fill" id="progressFill" style="width:0%"></div>
       </div>
       <p class="progress-label" id="progressLabel">暂无人加入</p>
     </div>
 
-    <div class="list-card">
-      <p class="list-header">完成情况</p>
-      <div class="user-list" id="userList">
-        <p class="empty">等待学生加入…</p>
-      </div>
+    <p class="section-label">完成情况</p>
+    <div class="user-list" id="userList">
+      <p class="empty">等待学生加入…</p>
     </div>
   </div>
 
@@ -272,11 +225,9 @@
       const r = await fetch(`${DB}/${path}.json`);
       return r.json();
     }
-
     async function fbSet(path, data) {
       await fetch(`${DB}/${path}.json`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
+        method: "PUT", headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data)
       });
     }
@@ -300,15 +251,15 @@
 
       const doneEl = document.getElementById("doneCount");
       doneEl.textContent = doneCount;
-      doneEl.className = "big-num" + (total > 0 && doneCount === total ? " all-done" : "");
+      doneEl.className = "num-done" + (total > 0 && doneCount === total ? " complete" : "");
 
       document.getElementById("totalCount").textContent = total;
       const pct = total > 0 ? Math.round(doneCount / total * 100) : 0;
       document.getElementById("progressFill").style.width = pct + "%";
       document.getElementById("progressLabel").textContent =
         total === 0 ? "暂无人加入" :
-        doneCount === total ? "🎉 全部完成！" :
-        `${pct}% · 还有 ${total - doneCount} 人未完成`;
+        doneCount === total ? "全部完成" :
+        `${doneCount} 人完成，${total - doneCount} 人未完成`;
 
       const list = document.getElementById("userList");
       if (total === 0) {
@@ -317,7 +268,7 @@
       }
       const pending = users.filter(u => !u.done);
       list.innerHTML = [
-        ...done.map(u => `<span class="user-chip done">✓ ${u.name}</span>`),
+        ...done.map(u => `<span class="user-chip done">${u.name}</span>`),
         ...pending.map(u => `<span class="user-chip pending">${u.name}</span>`)
       ].join("");
     }
