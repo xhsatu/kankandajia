@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>看看大家 · 教师端</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
+      background: #f2f2f7;
+      min-height: 100vh;
+      padding: 40px 24px;
+    }
+    header {
+      max-width: 680px;
+      margin: 0 auto 32px;
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 16px;
+    }
+    header h1 {
+      font-size: 34px;
+      font-weight: 700;
+      color: #1c1c1e;
+      line-height: 1;
+    }
+    header .subtitle {
+      font-size: 15px;
+      color: #8e8e93;
+      margin-top: 4px;
+    }
+    .controls {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-shrink: 0;
+    }
+    .btn-reset {
+      padding: 10px 20px;
+      background: #ff3b30;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity 0.15s;
+    }
+    .btn-reset:active { opacity: 0.75; }
+
+    .progress-card {
+      max-width: 680px;
+      margin: 0 auto 24px;
+      background: white;
+      border-radius: 20px;
+      padding: 28px 32px;
+      box-shadow: 0 2px 20px rgba(0,0,0,0.07);
+    }
+    .big-number {
+      font-size: 72px;
+      font-weight: 700;
+      line-height: 1;
+      color: #1c1c1e;
+    }
+    .big-number span { color: #007aff; }
+    .progress-bar-wrap {
+      margin-top: 16px;
+      background: #e5e5ea;
+      border-radius: 8px;
+      height: 10px;
+      overflow: hidden;
+    }
+    .progress-bar-fill {
+      height: 100%;
+      background: #34c759;
+      border-radius: 8px;
+      transition: width 0.4s ease;
+    }
+    .progress-label {
+      margin-top: 8px;
+      font-size: 14px;
+      color: #8e8e93;
+    }
+
+    .list-card {
+      max-width: 680px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 20px;
+      padding: 24px 32px;
+      box-shadow: 0 2px 20px rgba(0,0,0,0.07);
+    }
+    .list-card h2 {
+      font-size: 17px;
+      font-weight: 600;
+      color: #8e8e93;
+      margin-bottom: 16px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      font-size: 13px;
+    }
+    .user-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .user-chip {
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 15px;
+      font-weight: 500;
+      transition: all 0.3s;
+    }
+    .user-chip.done {
+      background: #d1f5d3;
+      color: #1a7a2e;
+    }
+    .user-chip.pending {
+      background: #f2f2f7;
+      color: #8e8e93;
+    }
+    .empty {
+      color: #c7c7cc;
+      font-size: 15px;
+      padding: 8px 0;
+    }
+
+    .session-row {
+      max-width: 680px;
+      margin: 0 auto 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 14px;
+      color: #8e8e93;
+    }
+    .session-row code {
+      background: white;
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 13px;
+      color: #1c1c1e;
+      border: 1px solid #e5e5ea;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div>
+      <h1>看看大家</h1>
+      <p class="subtitle">实时完成进度</p>
+    </div>
+    <div class="controls">
+      <button class="btn-reset" onclick="resetSession()">新一轮 ↺</button>
+    </div>
+  </header>
+
+  <div class="session-row">
+    当前场次：<code id="sessionCode">—</code>
+    <span>学生链接会自动同步</span>
+  </div>
+
+  <div class="progress-card">
+    <div class="big-number"><span id="doneCount">0</span> / <span id="totalCount">0</span></div>
+    <div class="progress-bar-wrap">
+      <div class="progress-bar-fill" id="progressFill" style="width:0%"></div>
+    </div>
+    <p class="progress-label" id="progressLabel">暂无人完成</p>
+  </div>
+
+  <div class="list-card">
+    <h2>完成情况</h2>
+    <div class="user-list" id="userList">
+      <p class="empty">等待学生加入…</p>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getDatabase, ref, onValue, remove, set } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyAD4m-YPEM7sLCGMk97Tx5L1QRZlqTK7d8",
+      authDomain: "kankandajia-beae8.firebaseapp.com",
+      projectId: "kankandajia-beae8",
+      storageBucket: "kankandajia-beae8.firebasestorage.app",
+      messagingSenderId: "272852234229",
+      appId: "1:272852234229:web:a40d576fbac1b8b880babc",
+      databaseURL: "https://kankandajia-beae8-default-rtdb.firebaseio.com"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    function getSessionKey() {
+      let key = localStorage.getItem("teacher_session");
+      if (!key) {
+        key = "s" + Date.now().toString(36);
+        localStorage.setItem("teacher_session", key);
+        // 广播给学生
+        set(ref(db, "current_session"), key);
+      }
+      return key;
+    }
+
+    window._db = db;
+    window._ref = ref;
+    window._remove = remove;
+    window._set = set;
+
+    let sessionKey = getSessionKey();
+    document.getElementById("sessionCode").textContent = sessionKey;
+
+    // 广播当前 session 给学生端
+    set(ref(db, "current_session"), sessionKey);
+
+    const sessionRef = ref(db, `sessions/${sessionKey}/users`);
+    onValue(sessionRef, (snap) => {
+      const data = snap.val() || {};
+      const users = Object.values(data);
+      const done = users.filter(u => u.done);
+      const pending = users.filter(u => !u.done);
+      const total = users.length;
+      const doneCount = done.length;
+
+      document.getElementById("doneCount").textContent = doneCount;
+      document.getElementById("totalCount").textContent = total;
+      const pct = total > 0 ? Math.round(doneCount / total * 100) : 0;
+      document.getElementById("progressFill").style.width = pct + "%";
+      document.getElementById("progressLabel").textContent =
+        total === 0 ? "暂无人加入" :
+        doneCount === total ? "🎉 全部完成！" :
+        `${pct}% 完成，还有 ${total - doneCount} 人未完成`;
+
+      const list = document.getElementById("userList");
+      if (total === 0) {
+        list.innerHTML = '<p class="empty">等待学生加入…</p>';
+        return;
+      }
+      const chips = [
+        ...done.map(u => `<span class="user-chip done">✅ ${u.name}</span>`),
+        ...pending.map(u => `<span class="user-chip pending">${u.name}</span>`)
+      ];
+      list.innerHTML = chips.join("");
+    });
+
+    window.resetSession = function() {
+      if (!confirm("开始新一轮？所有完成状态将清零。")) return;
+      sessionKey = "s" + Date.now().toString(36);
+      localStorage.setItem("teacher_session", sessionKey);
+      set(ref(db, "current_session"), sessionKey);
+      document.getElementById("sessionCode").textContent = sessionKey;
+
+      const newRef = ref(db, `sessions/${sessionKey}/users`);
+      onValue(newRef, (snap) => {
+        // re-bind handled by page reload approach below
+      });
+      location.reload();
+    };
+  </script>
+</body>
+</html>
