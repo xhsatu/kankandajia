@@ -152,11 +152,7 @@
       localStorage.setItem("teacher_session", key);
       sessionKey = key;
       await fbSet("current_session", key);
-      document.getElementById("doneCount").textContent = "0";
-      document.getElementById("totalCount").textContent = "0";
-      document.getElementById("progressFill").style.width = "0%";
-      document.getElementById("progressLabel").textContent = "暂无人加入";
-      document.getElementById("userList").innerHTML = '<p class="empty">等待学生加入…</p>';
+      poll();
     }
 
     init();
