@@ -133,13 +133,8 @@
       document.getElementById("doneBtn").className = "btn-done idle";
       document.getElementById("doneBtn").innerHTML = '<span class="icon">✋</span><span class="label">我做完了</span>';
       document.getElementById("doneBtn").onclick = markDone;
-      // 注册加入（异步，不阻塞）
       const key = sanitize(name);
-      fbGet(`sessions/${currentSession}/users/${key}`).then(existing => {
-        if (!existing || !existing.done) {
-          fbSet(`sessions/${currentSession}/users/${key}`, { done: false, name, ts: Date.now() });
-        }
-      });
+      fbSet(`sessions/${currentSession}/users/${key}`, { done: false, name, ts: Date.now() });
       startPolling(name);
     }
 
