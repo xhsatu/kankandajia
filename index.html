@@ -130,7 +130,7 @@
       });
     }
 
-    // 监听教师 session，session 变化时重置按钮
+    // 监听教师 session，session 变化时重新注册并绑定
     onValue(ref(db, "current_session"), (snap) => {
       const key = snap.val();
       if (!key) return;
@@ -139,10 +139,8 @@
 
       const name = localStorage.getItem("kankandajia_name");
       if (name && document.getElementById("doneSection").style.display !== "none") {
-        if (prev && prev !== key) {
-          // 新一轮，重置按钮
-          updateBtn(false);
-        }
+        if (prev && prev !== key) updateBtn(false);
+        registerJoined(name);
         bindUser(name, key);
       }
     });
@@ -153,6 +151,19 @@
       localStorage.setItem("kankandajia_name", name);
       showDone(name);
     };
+
+    function registerJoined(name) {
+      if (!currentSession) return;
+      const userRef = ref(db, `sessions/${currentSession}/users/${sanitize(name)}`);
+      // 只在没有记录时写入，避免覆盖 done 状态
+      import("https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js").then(({ get }) => {
+        get(userRef).then(snap => {
+          if (!snap.exists()) {
+            set(userRef, { done: false, name: name, ts: Date.now() });
+          }
+        });
+      });
+    }
 
     window.markDone = function() {
       const name = localStorage.getItem("kankandajia_name");
@@ -173,7 +184,10 @@
       document.getElementById("nameSection").style.display = "none";
       document.getElementById("doneSection").style.display = "block";
       document.getElementById("displayName").textContent = name;
-      if (currentSession) bindUser(name, currentSession);
+      if (currentSession) {
+        registerJoined(name);
+        bindUser(name, currentSession);
+      }
     }
 
     // 如果已有名字，等 session 加载后自动显示
