@@ -22,17 +22,8 @@
       text-align: center;
       box-shadow: 0 2px 20px rgba(0,0,0,0.08);
     }
-    .name-section h2 {
-      font-size: 22px;
-      font-weight: 600;
-      color: #1c1c1e;
-      margin-bottom: 8px;
-    }
-    .name-section p {
-      font-size: 15px;
-      color: #8e8e93;
-      margin-bottom: 24px;
-    }
+    .name-section h2 { font-size: 22px; font-weight: 600; color: #1c1c1e; margin-bottom: 8px; }
+    .name-section p { font-size: 15px; color: #8e8e93; margin-bottom: 24px; }
     input {
       width: 100%;
       padding: 14px 16px;
@@ -58,69 +49,33 @@
       transition: opacity 0.15s;
     }
     .btn-confirm:active { opacity: 0.75; }
-
     .done-section { display: none; }
-    .done-section .greeting {
-      font-size: 17px;
-      color: #8e8e93;
-      margin-bottom: 32px;
-    }
-    .done-section .greeting span {
-      color: #1c1c1e;
-      font-weight: 600;
-    }
+    .done-section .greeting { font-size: 17px; color: #8e8e93; margin-bottom: 32px; }
+    .done-section .greeting span { color: #1c1c1e; font-weight: 600; }
     .btn-done {
-      width: 180px;
-      height: 180px;
-      border-radius: 50%;
-      border: none;
-      font-size: 20px;
-      font-weight: 700;
-      cursor: pointer;
+      width: 180px; height: 180px; border-radius: 50%; border: none;
+      font-size: 20px; font-weight: 700; cursor: pointer;
       transition: transform 0.15s, box-shadow 0.15s;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      margin: 0 auto;
+      display: flex; flex-direction: column; align-items: center;
+      justify-content: center; gap: 8px; margin: 0 auto;
     }
-    .btn-done.idle {
-      background: #007aff;
-      color: white;
-      box-shadow: 0 8px 30px rgba(0,122,255,0.35);
-    }
+    .btn-done.idle { background: #007aff; color: white; box-shadow: 0 8px 30px rgba(0,122,255,0.35); }
     .btn-done.idle:active { transform: scale(0.95); }
-    .btn-done.completed {
-      background: #34c759;
-      color: white;
-      box-shadow: 0 8px 30px rgba(52,199,89,0.35);
-      cursor: default;
-    }
+    .btn-done.completed { background: #34c759; color: white; box-shadow: 0 8px 30px rgba(52,199,89,0.35); cursor: default; }
     .btn-done .icon { font-size: 40px; line-height: 1; }
     .btn-done .label { font-size: 18px; font-weight: 700; }
-    .change-name {
-      margin-top: 24px;
-      background: none;
-      border: none;
-      color: #8e8e93;
-      font-size: 14px;
-      cursor: pointer;
-    }
+    .change-name { margin-top: 24px; background: none; border: none; color: #8e8e93; font-size: 14px; cursor: pointer; }
     .change-name:hover { color: #007aff; }
   </style>
 </head>
 <body>
   <div class="card">
-    <!-- 输入姓名 -->
     <div class="name-section" id="nameSection">
       <h2>你好！</h2>
       <p>请输入你的名字</p>
       <input type="text" id="nameInput" placeholder="名字或编号" maxlength="20" />
       <button class="btn-confirm" onclick="confirmName()">确认</button>
     </div>
-
-    <!-- 签到按钮 -->
     <div class="done-section" id="doneSection">
       <p class="greeting">你好，<span id="displayName"></span></p>
       <button class="btn-done idle" id="doneBtn" onclick="markDone()">
@@ -133,9 +88,9 @@
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+    import { getDatabase, ref, set, onValue, off } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
-    const firebaseConfig = {
+    const app = initializeApp({
       apiKey: "AIzaSyAD4m-YPEM7sLCGMk97Tx5L1QRZlqTK7d8",
       authDomain: "kankandajia-beae8.firebaseapp.com",
       projectId: "kankandajia-beae8",
@@ -143,68 +98,14 @@
       messagingSenderId: "272852234229",
       appId: "1:272852234229:web:a40d576fbac1b8b880babc",
       databaseURL: "https://kankandajia-beae8-default-rtdb.firebaseio.com"
-    };
-
-    const app = initializeApp(firebaseConfig);
+    });
     const db = getDatabase(app);
 
-    window._db = db;
-    window._ref = ref;
-    window._set = set;
-    window._onValue = onValue;
+    let currentSession = null;
+    let userListener = null;
 
-    // 自动跟随教师当前场次
-    const sessionRef = ref(db, "current_session");
-    onValue(sessionRef, (snap) => {
-      const key = snap.val();
-      if (key && key !== localStorage.getItem("kankandajia_session")) {
-        localStorage.setItem("kankandajia_session", key);
-        // 如果已在签到界面，重新绑定
-        const name = localStorage.getItem("kankandajia_name");
-        if (name && document.getElementById("doneSection").style.display !== "none") {
-          showDoneSection(name);
-        }
-      }
-    });
-
-    const saved = localStorage.getItem("kankandajia_name");
-    if (saved) showDoneSection(saved);
-  </script>
-
-  <script>
-    function confirmName() {
-      const name = document.getElementById("nameInput").value.trim();
-      if (!name) return;
-      localStorage.setItem("kankandajia_name", name);
-      showDoneSection(name);
-    }
-
-    function showDoneSection(name) {
-      document.getElementById("nameSection").style.display = "none";
-      document.getElementById("doneSection").style.display = "block";
-      document.getElementById("displayName").textContent = name;
-
-      const sessionKey = getSessionKey();
-      const userRef = window._ref(window._db, `sessions/${sessionKey}/users/${sanitize(name)}`);
-      window._onValue(userRef, (snap) => {
-        const done = snap.val()?.done === true;
-        updateBtn(done);
-      });
-    }
-
-    function markDone() {
-      const name = localStorage.getItem("kankandajia_name");
-      if (!name) return;
-      const sessionKey = getSessionKey();
-      const userRef = window._ref(window._db, `sessions/${sessionKey}/users/${sanitize(name)}`);
-      window._set(userRef, { done: true, name: name, ts: Date.now() });
-    }
-
-    function changeName() {
-      localStorage.removeItem("kankandajia_name");
-      document.getElementById("doneSection").style.display = "none";
-      document.getElementById("nameSection").style.display = "block";
-      document.getElementById("nameInput").value = "";
+    function sanitize(str) {
+      return str.replace(/[.#$\[\]\/]/g, "_");
     }
 
     function updateBtn(done) {
@@ -216,20 +117,76 @@
       } else {
         btn.className = "btn-done idle";
         btn.innerHTML = '<span class="icon">✋</span><span class="label">我做完了</span>';
-        btn.onclick = markDone;
+        btn.onclick = window.markDone;
       }
     }
 
-    function getSessionKey() {
-      return localStorage.getItem("kankandajia_session") || "default";
+    function bindUser(name, session) {
+      if (userListener) off(userListener);
+      const userRef = ref(db, `sessions/${session}/users/${sanitize(name)}`);
+      userListener = userRef;
+      onValue(userRef, (snap) => {
+        updateBtn(snap.val()?.done === true);
+      });
     }
 
-    function sanitize(str) {
-      return str.replace(/[.#$\[\]\/]/g, "_");
+    // 监听教师 session，session 变化时重置按钮
+    onValue(ref(db, "current_session"), (snap) => {
+      const key = snap.val();
+      if (!key) return;
+      const prev = currentSession;
+      currentSession = key;
+
+      const name = localStorage.getItem("kankandajia_name");
+      if (name && document.getElementById("doneSection").style.display !== "none") {
+        if (prev && prev !== key) {
+          // 新一轮，重置按钮
+          updateBtn(false);
+        }
+        bindUser(name, key);
+      }
+    });
+
+    window.confirmName = function() {
+      const name = document.getElementById("nameInput").value.trim();
+      if (!name) return;
+      localStorage.setItem("kankandajia_name", name);
+      showDone(name);
+    };
+
+    window.markDone = function() {
+      const name = localStorage.getItem("kankandajia_name");
+      if (!name || !currentSession) return;
+      set(ref(db, `sessions/${currentSession}/users/${sanitize(name)}`), {
+        done: true, name: name, ts: Date.now()
+      });
+    };
+
+    window.changeName = function() {
+      localStorage.removeItem("kankandajia_name");
+      document.getElementById("doneSection").style.display = "none";
+      document.getElementById("nameSection").style.display = "block";
+      document.getElementById("nameInput").value = "";
+    };
+
+    function showDone(name) {
+      document.getElementById("nameSection").style.display = "none";
+      document.getElementById("doneSection").style.display = "block";
+      document.getElementById("displayName").textContent = name;
+      if (currentSession) bindUser(name, currentSession);
+    }
+
+    // 如果已有名字，等 session 加载后自动显示
+    const saved = localStorage.getItem("kankandajia_name");
+    if (saved) {
+      // session 监听器会在收到 key 后调用 bindUser
+      document.getElementById("nameSection").style.display = "none";
+      document.getElementById("doneSection").style.display = "block";
+      document.getElementById("displayName").textContent = saved;
     }
 
     document.getElementById("nameInput").addEventListener("keydown", e => {
-      if (e.key === "Enter") confirmName();
+      if (e.key === "Enter") window.confirmName();
     });
   </script>
 </body>
