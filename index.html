@@ -54,7 +54,7 @@
     .done-section .greeting span { color: #1c1c1e; font-weight: 600; }
     .btn-done {
       width: 180px; height: 180px; border-radius: 50%; border: none;
-      font-size: 20px; font-weight: 700; cursor: pointer;
+      cursor: pointer;
       transition: transform 0.15s, box-shadow 0.15s;
       display: flex; flex-direction: column; align-items: center;
       justify-content: center; gap: 8px; margin: 0 auto;
@@ -86,26 +86,93 @@
     </div>
   </div>
 
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getDatabase, ref, set, onValue, off } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
-
-    const app = initializeApp({
-      apiKey: "AIzaSyAD4m-YPEM7sLCGMk97Tx5L1QRZlqTK7d8",
-      authDomain: "kankandajia-beae8.firebaseapp.com",
-      projectId: "kankandajia-beae8",
-      storageBucket: "kankandajia-beae8.firebasestorage.app",
-      messagingSenderId: "272852234229",
-      appId: "1:272852234229:web:a40d576fbac1b8b880babc",
-      databaseURL: "https://kankandajia-beae8-default-rtdb.firebaseio.com"
-    });
-    const db = getDatabase(app);
-
+  <script>
+    const DB = "https://kankandajia-beae8-default-rtdb.firebaseio.com";
     let currentSession = null;
-    let userListener = null;
+    let pollTimer = null;
+    let myName = null;
 
     function sanitize(str) {
-      return str.replace(/[.#$\[\]\/]/g, "_");
+      return encodeURIComponent(str.replace(/[.#$\[\]\/]/g, "_"));
+    }
+
+    async function fbGet(path) {
+      const r = await fetch(`${DB}/${path}.json`);
+      return r.json();
+    }
+
+    async function fbSet(path, data) {
+      await fetch(`${DB}/${path}.json`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data)
+      });
+    }
+
+    async function init() {
+      const session = await fbGet("current_session");
+      currentSession = session;
+      myName = localStorage.getItem("kankandajia_name");
+      if (myName) {
+        showDone(myName);
+      }
+    }
+
+    function confirmName() {
+      const name = document.getElementById("nameInput").value.trim();
+      if (!name) return;
+      localStorage.setItem("kankandajia_name", name);
+      myName = name;
+      showDone(name);
+    }
+
+    async function showDone(name) {
+      document.getElementById("nameSection").style.display = "none";
+      document.getElementById("doneSection").style.display = "block";
+      document.getElementById("displayName").textContent = name;
+      // 注册加入
+      const key = sanitize(name);
+      const existing = await fbGet(`sessions/${currentSession}/users/${key}`);
+      if (!existing || !existing.done) {
+        await fbSet(`sessions/${currentSession}/users/${key}`, { done: false, name, ts: Date.now() });
+      }
+      startPolling(name);
+    }
+
+    function startPolling(name) {
+      if (pollTimer) clearInterval(pollTimer);
+      pollTimer = setInterval(() => pollState(name), 2000);
+      pollState(name);
+    }
+
+    async function pollState(name) {
+      // 检查 session 是否换了
+      const session = await fbGet("current_session");
+      if (session !== currentSession) {
+        currentSession = session;
+        // 新一轮，重新注册
+        updateBtn(false);
+        const key = sanitize(name);
+        await fbSet(`sessions/${currentSession}/users/${key}`, { done: false, name, ts: Date.now() });
+      }
+      const key = sanitize(name);
+      const data = await fbGet(`sessions/${currentSession}/users/${key}`);
+      updateBtn(data && data.done === true);
+    }
+
+    async function markDone() {
+      if (!myName || !currentSession) return;
+      const key = sanitize(myName);
+      await fbSet(`sessions/${currentSession}/users/${key}`, { done: true, name: myName, ts: Date.now() });
+      updateBtn(true);
+    }
+
+    function changeName() {
+      localStorage.removeItem("kankandajia_name");
+      if (pollTimer) clearInterval(pollTimer);
+      document.getElementById("doneSection").style.display = "none";
+      document.getElementById("nameSection").style.display = "block";
+      document.getElementById("nameInput").value = "";
     }
 
     function updateBtn(done) {
@@ -117,91 +184,15 @@
       } else {
         btn.className = "btn-done idle";
         btn.innerHTML = '<span class="icon">✋</span><span class="label">我做完了</span>';
-        btn.onclick = window.markDone;
+        btn.onclick = markDone;
       }
-    }
-
-    function bindUser(name, session) {
-      if (userListener) off(userListener);
-      const userRef = ref(db, `sessions/${session}/users/${sanitize(name)}`);
-      userListener = userRef;
-      onValue(userRef, (snap) => {
-        updateBtn(snap.val()?.done === true);
-      });
-    }
-
-    // 监听教师 session，session 变化时重新注册并绑定
-    onValue(ref(db, "current_session"), (snap) => {
-      const key = snap.val();
-      if (!key) return;
-      const prev = currentSession;
-      currentSession = key;
-
-      const name = localStorage.getItem("kankandajia_name");
-      if (name && document.getElementById("doneSection").style.display !== "none") {
-        if (prev && prev !== key) updateBtn(false);
-        registerJoined(name);
-        bindUser(name, key);
-      }
-    });
-
-    window.confirmName = function() {
-      const name = document.getElementById("nameInput").value.trim();
-      if (!name) return;
-      localStorage.setItem("kankandajia_name", name);
-      showDone(name);
-    };
-
-    function registerJoined(name) {
-      if (!currentSession) return;
-      const userRef = ref(db, `sessions/${currentSession}/users/${sanitize(name)}`);
-      // 只在没有记录时写入，避免覆盖 done 状态
-      import("https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js").then(({ get }) => {
-        get(userRef).then(snap => {
-          if (!snap.exists()) {
-            set(userRef, { done: false, name: name, ts: Date.now() });
-          }
-        });
-      });
-    }
-
-    window.markDone = function() {
-      const name = localStorage.getItem("kankandajia_name");
-      if (!name || !currentSession) return;
-      set(ref(db, `sessions/${currentSession}/users/${sanitize(name)}`), {
-        done: true, name: name, ts: Date.now()
-      });
-    };
-
-    window.changeName = function() {
-      localStorage.removeItem("kankandajia_name");
-      document.getElementById("doneSection").style.display = "none";
-      document.getElementById("nameSection").style.display = "block";
-      document.getElementById("nameInput").value = "";
-    };
-
-    function showDone(name) {
-      document.getElementById("nameSection").style.display = "none";
-      document.getElementById("doneSection").style.display = "block";
-      document.getElementById("displayName").textContent = name;
-      if (currentSession) {
-        registerJoined(name);
-        bindUser(name, currentSession);
-      }
-    }
-
-    // 如果已有名字，等 session 加载后自动显示
-    const saved = localStorage.getItem("kankandajia_name");
-    if (saved) {
-      // session 监听器会在收到 key 后调用 bindUser
-      document.getElementById("nameSection").style.display = "none";
-      document.getElementById("doneSection").style.display = "block";
-      document.getElementById("displayName").textContent = saved;
     }
 
     document.getElementById("nameInput").addEventListener("keydown", e => {
-      if (e.key === "Enter") window.confirmName();
+      if (e.key === "Enter") confirmName();
     });
+
+    init();
   </script>
 </body>
 </html>
