@@ -83,6 +83,7 @@
         <span class="label">我做完了</span>
       </button>
       <button class="change-name" onclick="changeName()">不是我？换个名字</button>
+      <p id="sessionLabel" style="margin-top:12px;font-size:12px;color:#c7c7cc;"></p>
     </div>
   </div>
 
@@ -157,6 +158,8 @@
       const key = sanitize(name);
       const data = await fbGet(`sessions/${currentSession}/users/${key}`);
       updateBtn(data && data.done === true);
+      const lbl = document.getElementById("sessionLabel");
+      if (lbl) lbl.textContent = "轮次：" + currentSession;
     }
 
     async function markDone() {
