@@ -4,68 +4,213 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>我做完了</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
+    :root {
+      --bg: #0e0f14;
+      --surface: #181920;
+      --surface2: #21232e;
+      --border: rgba(255,255,255,0.07);
+      --accent: #5b8cff;
+      --accent-glow: rgba(91,140,255,0.3);
+      --green: #2dce72;
+      --green-glow: rgba(45,206,114,0.3);
+      --text: #f0f1f5;
+      --muted: rgba(240,241,245,0.4);
+      --muted2: rgba(240,241,245,0.18);
+    }
+
     * { box-sizing: border-box; margin: 0; padding: 0; }
+
     body {
-      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
-      background: #f2f2f7;
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
       min-height: 100vh;
       display: flex;
       align-items: center;
       justify-content: center;
+      overflow: hidden;
     }
+
+    /* Ambient background orbs */
+    body::before, body::after {
+      content: '';
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(80px);
+      pointer-events: none;
+      z-index: 0;
+    }
+    body::before {
+      width: 400px; height: 400px;
+      background: radial-gradient(circle, rgba(91,140,255,0.12) 0%, transparent 70%);
+      top: -100px; right: -100px;
+    }
+    body::after {
+      width: 300px; height: 300px;
+      background: radial-gradient(circle, rgba(45,206,114,0.08) 0%, transparent 70%);
+      bottom: -80px; left: -80px;
+    }
+
     .card {
-      background: white;
-      border-radius: 20px;
-      padding: 48px 40px;
-      width: 340px;
+      position: relative;
+      z-index: 1;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 28px;
+      padding: 52px 44px;
+      width: 360px;
       text-align: center;
-      box-shadow: 0 2px 20px rgba(0,0,0,0.08);
+      box-shadow: 0 0 0 1px rgba(255,255,255,0.04), 0 32px 64px rgba(0,0,0,0.5);
+      animation: cardIn 0.5s cubic-bezier(0.34,1.56,0.64,1) both;
     }
-    .name-section h2 { font-size: 22px; font-weight: 600; color: #1c1c1e; margin-bottom: 8px; }
-    .name-section p { font-size: 15px; color: #8e8e93; margin-bottom: 24px; }
+
+    @keyframes cardIn {
+      from { opacity: 0; transform: translateY(24px) scale(0.96); }
+      to   { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    /* ── NAME SECTION ── */
+    .name-section h2 {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 6px;
+      letter-spacing: -0.3px;
+    }
+    .name-section p {
+      font-size: 14px;
+      color: var(--muted);
+      margin-bottom: 28px;
+    }
+
     input {
       width: 100%;
-      padding: 14px 16px;
-      border: 1.5px solid #e5e5ea;
-      border-radius: 12px;
-      font-size: 17px;
+      padding: 14px 18px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      font-size: 16px;
+      font-family: 'DM Sans', sans-serif;
       outline: none;
-      transition: border-color 0.2s;
-      color: #1c1c1e;
+      color: var(--text);
+      transition: border-color 0.2s, box-shadow 0.2s;
     }
-    input:focus { border-color: #007aff; }
+    input::placeholder { color: var(--muted2); }
+    input:focus {
+      border-color: rgba(91,140,255,0.5);
+      box-shadow: 0 0 0 3px rgba(91,140,255,0.12);
+    }
+
     .btn-confirm {
-      margin-top: 16px;
+      margin-top: 12px;
       width: 100%;
       padding: 15px;
-      background: #007aff;
+      background: var(--accent);
       color: white;
       border: none;
-      border-radius: 12px;
-      font-size: 17px;
+      border-radius: 14px;
+      font-size: 16px;
       font-weight: 600;
+      font-family: 'DM Sans', sans-serif;
       cursor: pointer;
-      transition: opacity 0.15s;
+      transition: transform 0.15s, box-shadow 0.15s, opacity 0.15s;
+      box-shadow: 0 4px 20px var(--accent-glow);
     }
-    .btn-confirm:active { opacity: 0.75; }
+    .btn-confirm:hover { transform: translateY(-1px); box-shadow: 0 6px 24px var(--accent-glow); }
+    .btn-confirm:active { transform: scale(0.97); opacity: 0.85; }
+
+    /* ── DONE SECTION ── */
     .done-section { display: none; }
-    .done-section .greeting { font-size: 17px; color: #8e8e93; margin-bottom: 32px; }
-    .done-section .greeting span { color: #1c1c1e; font-weight: 600; }
-    .btn-done {
-      width: 180px; height: 180px; border-radius: 50%; border: none;
-      cursor: pointer;
-      transition: transform 0.15s, box-shadow 0.15s;
-      display: flex; flex-direction: column; align-items: center;
-      justify-content: center; gap: 8px; margin: 0 auto;
+
+    .greeting {
+      font-size: 15px;
+      color: var(--muted);
+      margin-bottom: 36px;
     }
-    .btn-done.idle { background: #007aff; color: white; box-shadow: 0 8px 30px rgba(0,122,255,0.35); }
-    .btn-done.idle:active { transform: scale(0.95); }
-    .btn-done.completed { background: #34c759; color: white; box-shadow: 0 8px 30px rgba(52,199,89,0.35); cursor: default; }
-    .btn-done .icon { font-size: 40px; line-height: 1; }
-    .btn-done .label { font-size: 18px; font-weight: 700; }
-    .change-name { margin-top: 24px; background: none; border: none; color: #8e8e93; font-size: 14px; cursor: pointer; }
-    .change-name:hover { color: #007aff; }
+    .greeting span {
+      color: var(--text);
+      font-weight: 600;
+    }
+
+    /* Big circle button */
+    .btn-done {
+      position: relative;
+      width: 192px; height: 192px;
+      border-radius: 50%;
+      border: none;
+      cursor: pointer;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 10px;
+      margin: 0 auto;
+      transition: transform 0.2s cubic-bezier(0.34,1.56,0.64,1);
+      outline: none;
+    }
+
+    .btn-done.idle {
+      background: linear-gradient(145deg, #5b8cff, #3a6bef);
+      box-shadow: 0 0 0 0 var(--accent-glow), 0 12px 40px rgba(91,140,255,0.4);
+      animation: idlePulse 3s ease-in-out infinite;
+    }
+    @keyframes idlePulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(91,140,255,0.4), 0 12px 40px rgba(91,140,255,0.4); }
+      50%       { box-shadow: 0 0 0 14px rgba(91,140,255,0), 0 12px 40px rgba(91,140,255,0.4); }
+    }
+    .btn-done.idle:hover  { transform: scale(1.04); }
+    .btn-done.idle:active { transform: scale(0.94); }
+
+    .btn-done.completed {
+      background: linear-gradient(145deg, #2dce72, #1ab05e);
+      box-shadow: 0 0 0 0 var(--green-glow), 0 12px 40px rgba(45,206,114,0.4);
+      cursor: default;
+      animation: completedPop 0.5s cubic-bezier(0.34,1.56,0.64,1) both, greenPulse 3s 0.5s ease-in-out infinite;
+    }
+    @keyframes completedPop {
+      from { transform: scale(0.8); opacity: 0.5; }
+      to   { transform: scale(1); opacity: 1; }
+    }
+    @keyframes greenPulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(45,206,114,0.4), 0 12px 40px rgba(45,206,114,0.4); }
+      50%       { box-shadow: 0 0 0 14px rgba(45,206,114,0), 0 12px 40px rgba(45,206,114,0.4); }
+    }
+
+    /* Ripple on click */
+    .btn-done .ripple {
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.25);
+      transform: scale(0);
+      animation: rippleAnim 0.6s linear;
+      pointer-events: none;
+    }
+    @keyframes rippleAnim {
+      to { transform: scale(4); opacity: 0; }
+    }
+
+    .btn-done .icon { font-size: 44px; line-height: 1; }
+    .btn-done .label { font-size: 17px; font-weight: 700; color: white; letter-spacing: -0.2px; }
+
+    .change-name {
+      margin-top: 24px;
+      background: none;
+      border: none;
+      color: var(--muted);
+      font-size: 13px;
+      font-family: 'DM Sans', sans-serif;
+      cursor: pointer;
+      transition: color 0.15s;
+    }
+    .change-name:hover { color: var(--accent); }
+
+    #sessionLabel {
+      margin-top: 14px;
+      font-size: 11px;
+      color: var(--muted2);
+      font-family: 'DM Sans', monospace;
+      letter-spacing: 0.3px;
+    }
   </style>
 </head>
 <body>
@@ -74,7 +219,7 @@
       <h2>你好！</h2>
       <p>请输入你的名字</p>
       <input type="text" id="nameInput" placeholder="名字或编号" maxlength="20" />
-      <button class="btn-confirm" onclick="confirmName()">确认</button>
+      <button class="btn-confirm" onclick="confirmName()">进入</button>
     </div>
     <div class="done-section" id="doneSection">
       <p class="greeting">你好，<span id="displayName"></span></p>
@@ -83,7 +228,7 @@
         <span class="label">我做完了</span>
       </button>
       <button class="change-name" onclick="changeName()">不是我？换个名字</button>
-      <p id="sessionLabel" style="margin-top:12px;font-size:12px;color:#c7c7cc;"></p>
+      <p id="sessionLabel"></p>
     </div>
   </div>
 
@@ -146,11 +291,9 @@
     }
 
     async function pollState(name) {
-      // 检查 session 是否换了
       const session = await fbGet("current_session");
       if (session !== currentSession) {
         currentSession = session;
-        // 新一轮，重新注册
         updateBtn(false);
         const key = sanitize(name);
         await fbSet(`sessions/${currentSession}/users/${key}`, { done: false, name, ts: Date.now() });
@@ -194,6 +337,18 @@
         btn.onclick = markDone;
       }
     }
+
+    // Ripple effect
+    document.addEventListener("click", e => {
+      const btn = e.target.closest(".btn-done.idle");
+      if (!btn) return;
+      const r = document.createElement("span");
+      r.className = "ripple";
+      const size = btn.offsetWidth;
+      r.style.cssText = `width:${size}px;height:${size}px;left:0;top:0;`;
+      btn.appendChild(r);
+      setTimeout(() => r.remove(), 700);
+    });
 
     document.getElementById("nameInput").addEventListener("keydown", e => {
       if (e.key === "Enter") confirmName();
