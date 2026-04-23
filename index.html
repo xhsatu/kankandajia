@@ -164,9 +164,9 @@
 
     async function markDone() {
       if (!myName || !currentSession) return;
-      const key = sanitize(myName);
-      await fbSet(`sessions/${currentSession}/users/${key}`, { done: true, name: myName, ts: Date.now() });
       updateBtn(true);
+      const key = sanitize(myName);
+      fbSet(`sessions/${currentSession}/users/${key}`, { done: true, name: myName, ts: Date.now() });
     }
 
     function changeName() {
