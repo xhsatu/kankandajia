@@ -93,7 +93,7 @@
     let myName = null;
 
     function sanitize(str) {
-      return encodeURIComponent(str.replace(/[.#$\[\]\/]/g, "_"));
+      return str.replace(/[.#$\[\]\/]/g, "_");
     }
 
     async function fbGet(path) {
